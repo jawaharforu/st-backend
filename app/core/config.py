@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     MINIO_SECURE: bool = False
     
     # CORS
-    BACKEND_CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:3001", "http://localhost:8000"]
+    BACKEND_CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:3001", "http://localhost:8000", "https://st.eonoia.cloud", "https://app.eonoia.cloud"]
 
     class Config:
         env_file = ".env"
