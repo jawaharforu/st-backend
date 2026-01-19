@@ -16,17 +16,14 @@ import os
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if DATABASE_URL:
-    config.set_main_option("sqlalchemy.url", DATABASE_URL)
+# Prefer DATABASE_URL from environment (Docker), fallback to settings
+config.set_main_option("sqlalchemy.url", DATABASE_URL or settings.DATABASE_URL)
 
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
-
-# Overwrite the sqlalchemy.url with the one from our settings
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
