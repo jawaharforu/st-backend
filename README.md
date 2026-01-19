@@ -6,3 +6,6 @@ Quick Start:
 1. `docker-compose up -d --build`
 2. `docker-compose exec app alembic upgrade head`
 3. Go to `http://localhost:8000/docs`
+
+
+http://your-vps-ip:18083

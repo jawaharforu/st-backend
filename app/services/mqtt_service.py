@@ -13,6 +13,9 @@ class MQTTService:
         self.is_connected = False
 
     async def start(self):
+        import sys
+        print(f"🔌 MQTT Starting - connecting to {settings.MQTT_BROKER}:{settings.MQTT_PORT}", flush=True)
+        sys.stdout.flush()
         self.client = aiomqtt.Client(
             hostname=settings.MQTT_BROKER,
             port=settings.MQTT_PORT,
@@ -22,10 +25,13 @@ class MQTTService:
         try:
             await self.client.__aenter__()
             self.is_connected = True
+            print("✅ MQTT Connected to Broker!", flush=True)
+            print(f"✅ Subscribed to: incubators/+/telemetry", flush=True)
             logger.info("Connected to MQTT Broker")
             # Start subscription loop in background
             asyncio.create_task(self._subscribe_loop())
         except Exception as e:
+            print(f"❌ MQTT Connection Failed: {e}", flush=True)
             logger.error(f"Failed to connect to MQTT: {e}")
 
     async def stop(self):
@@ -60,13 +66,17 @@ class MQTTService:
                 payload = message.payload.decode()
                 topic_parts = message.topic.value.split("/") 
                 # incubators, device_id, telemetry
+                logger.info(f"📨 MQTT Message received on topic: {message.topic.value}")
                 if len(topic_parts) == 3:
                     device_id = topic_parts[1]
+                    logger.info(f"📊 Telemetry from device: {device_id}")
+                    logger.info(f"📦 Payload: {payload[:200]}...")  # First 200 chars
                     await self.handle_telemetry(device_id, payload)
             except Exception as e:
                 logger.error(f"Error processing MQTT message: {e}")
 
     async def handle_telemetry(self, device_id: str, payload: str):
+        logger.info(f"✅ Processing telemetry for device: {device_id}")
         from app.services.ingestion import process_telemetry
         await process_telemetry(device_id, payload)
 

@@ -222,6 +222,16 @@ async def update_device(
         device.humidity_temp = device_in.humidity_temp
     if device_in.timer_sec is not None:
         device.timer_sec = device_in.timer_sec
+    
+    # Sensor Calibration Offsets
+    if device_in.sensor1_offset is not None:
+        device.sensor1_offset = device_in.sensor1_offset
+    if device_in.sensor2_offset is not None:
+        device.sensor2_offset = device_in.sensor2_offset
+    
+    # Motor Control
+    if device_in.motor_mode is not None:
+        device.motor_mode = device_in.motor_mode
 
     db.add(device)
     await db.commit()

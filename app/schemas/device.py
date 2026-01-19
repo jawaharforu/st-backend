@@ -6,26 +6,40 @@ import uuid
 
 class DeviceCreate(DeviceBase):
     farm_id: Optional[uuid.UUID] = None
-    # Device Type 3 Configuration Fields (temperatures in Fahrenheit)
-    temp_high: Optional[float] = None  # High temperature threshold (°F)
-    temp_low: Optional[float] = None   # Low temperature threshold (°F)
-    temp_x: Optional[float] = None     # Temperature X value (°F)
-    humidity: Optional[float] = None   # Target humidity (%)
-    humidity_temp: Optional[float] = None  # Humidity temperature (°F)
-    timer_sec: Optional[int] = None    # Timer duration (seconds)
+    # Temperature Thresholds (°F)
+    temp_high: Optional[float] = None  # High threshold - heaters OFF above this
+    temp_low: Optional[float] = None   # Low threshold - heaters ON below this
+    # Cooling Threshold (°F)
+    humidity_temp: Optional[float] = None  # Sensor 2 threshold - cooling ON above this
+    # Sensor Calibration Offsets (°F)
+    sensor1_offset: Optional[float] = 0.0  # Sensor 1 calibration offset
+    sensor2_offset: Optional[float] = 0.0  # Sensor 2 calibration offset
+    # Motor Control
+    motor_mode: Optional[int] = 0  # 0=Timer, 1=Always ON
+    timer_sec: Optional[int] = None  # Motor timer interval (seconds)
+    # Legacy fields
+    temp_x: Optional[float] = None
+    humidity: Optional[float] = None
 
 class DeviceUpdate(SQLModel):
     model: Optional[str] = None
     firmware_version: Optional[str] = None
     status: Optional[str] = None
     farm_id: Optional[uuid.UUID] = None
-    # Device Type 3 Configuration Fields (temperatures in Fahrenheit)
+    # Temperature Thresholds (°F)
     temp_high: Optional[float] = None
     temp_low: Optional[float] = None
+    # Cooling Threshold (°F)
+    humidity_temp: Optional[float] = None
+    # Sensor Calibration Offsets (°F)
+    sensor1_offset: Optional[float] = None
+    sensor2_offset: Optional[float] = None
+    # Motor Control
+    motor_mode: Optional[int] = None
+    timer_sec: Optional[int] = None
+    # Legacy fields
     temp_x: Optional[float] = None
     humidity: Optional[float] = None
-    humidity_temp: Optional[float] = None
-    timer_sec: Optional[int] = None
 
 class DeviceResponse(DeviceBase):
     id: uuid.UUID
@@ -33,13 +47,20 @@ class DeviceResponse(DeviceBase):
     last_seen: Optional[datetime] = None
     credentials: Optional[Dict[str, Any]] = None
     latest_telemetry: Optional[Dict[str, Any]] = None
-    # Device Type 3 Configuration Fields
+    # Temperature Thresholds
     temp_high: Optional[float] = None
     temp_low: Optional[float] = None
+    # Cooling Threshold
+    humidity_temp: Optional[float] = None
+    # Sensor Calibration Offsets
+    sensor1_offset: Optional[float] = None
+    sensor2_offset: Optional[float] = None
+    # Motor Control
+    motor_mode: Optional[int] = None
+    timer_sec: Optional[int] = None
+    # Legacy fields
     temp_x: Optional[float] = None
     humidity: Optional[float] = None
-    humidity_temp: Optional[float] = None
-    timer_sec: Optional[int] = None
 
 class DeviceAnalysisResponse(SQLModel):
     status: str
@@ -53,4 +74,3 @@ class DeviceStatsResponse(SQLModel):
     avg_temp_c: Optional[float] = None
     max_hum_pct: Optional[float] = None
     avg_hum_pct: Optional[float] = None
-

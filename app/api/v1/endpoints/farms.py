@@ -133,13 +133,20 @@ async def create_device_for_farm(
         device_id=device_in.device_id,
         model=device_in.model,
         firmware_version=device_in.firmware_version,
-        # Device Type 3 Configuration Fields
+        # Temperature Thresholds
         temp_high=device_in.temp_high,
         temp_low=device_in.temp_low,
+        # Cooling Threshold
+        humidity_temp=device_in.humidity_temp,
+        # Sensor Calibration Offsets
+        sensor1_offset=device_in.sensor1_offset,
+        sensor2_offset=device_in.sensor2_offset,
+        # Motor Control
+        motor_mode=device_in.motor_mode,
+        timer_sec=device_in.timer_sec,
+        # Legacy fields
         temp_x=device_in.temp_x,
         humidity=device_in.humidity,
-        humidity_temp=device_in.humidity_temp,
-        timer_sec=device_in.timer_sec,
         status="registered",
         credentials=token_data
     )

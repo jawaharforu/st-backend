@@ -14,9 +14,12 @@ async def process_telemetry(device_id_str: str, payload_str: str):
     """
     Validate, Store to DB, Publish to Redis
     """
+    print(f"📥 INGESTION: Processing telemetry for device: {device_id_str}", flush=True)
     try:
         data = json.loads(payload_str)
+        print(f"📥 INGESTION: Payload parsed successfully", flush=True)
     except json.JSONDecodeError:
+        print(f"❌ INGESTION: Invalid JSON!", flush=True)
         logger.error("Invalid JSON telemetry")
         return
 
@@ -52,8 +55,11 @@ async def process_telemetry(device_id_str: str, payload_str: str):
         device = result.scalars().first()
         
         if not device:
+            print(f"❌ INGESTION: Device not found in DB: {device_id_str}", flush=True)
             logger.warning(f"Unknown device: {device_id_str}")
             return
+        
+        print(f"✅ INGESTION: Device found! UUID: {device.id}", flush=True)
             
         # Create Telemetry Record
         telemetry = Telemetry(
@@ -84,6 +90,25 @@ async def process_telemetry(device_id_str: str, payload_str: str):
         
         # Update Device Last Seen
         device.last_seen = ts_val
+        
+        # Update device settings from telemetry (sync from device → server)
+        if "temp_low" in data:
+            device.temp_low = data.get("temp_low")
+        if "temp_high" in data:
+            device.temp_high = data.get("temp_high")
+        if "humidity_temp" in data:
+            device.humidity_temp = data.get("humidity_temp")
+        if "sensor1_offset" in data:
+            device.sensor1_offset = data.get("sensor1_offset")
+        if "sensor2_offset" in data:
+            device.sensor2_offset = data.get("sensor2_offset")
+        if "motor_mode" in data:
+            device.motor_mode = data.get("motor_mode")
+        if "timer_sec" in data:
+            device.timer_sec = data.get("timer_sec")
+        
+        # Update device status to online
+        device.status = "online"
         session.add(device)
         
         # Cache IDs before commit (commit expires objects)

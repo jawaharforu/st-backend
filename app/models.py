@@ -57,13 +57,24 @@ class Device(DeviceBase, table=True):
     last_seen: Optional[datetime] = Field(default=None, sa_type=DateTime(timezone=True))
     created_at: datetime = Field(sa_type=DateTime(timezone=True), sa_column_kwargs={"server_default": func.now()})
     
-    # Device Type 3 Configuration Fields (temperatures in Fahrenheit)
-    temp_high: Optional[float] = Field(default=None, description="High temperature threshold (°F)")
-    temp_low: Optional[float] = Field(default=None, description="Low temperature threshold (°F)")
+    # Temperature Thresholds (°F)
+    temp_high: Optional[float] = Field(default=None, description="High threshold - heaters OFF above this (°F)")
+    temp_low: Optional[float] = Field(default=None, description="Low threshold - heaters ON below this (°F)")
+    
+    # Cooling Threshold (°F)
+    humidity_temp: Optional[float] = Field(default=None, description="Sensor 2 threshold - cooling ON above this (°F)")
+    
+    # Sensor Calibration Offsets (°F)
+    sensor1_offset: Optional[float] = Field(default=0.0, description="Sensor 1 calibration offset (°F)")
+    sensor2_offset: Optional[float] = Field(default=0.0, description="Sensor 2 calibration offset (°F)")
+    
+    # Motor Control
+    motor_mode: Optional[int] = Field(default=0, description="Motor mode: 0=Timer, 1=Always ON")
+    timer_sec: Optional[int] = Field(default=None, description="Motor timer interval (seconds)")
+    
+    # Legacy fields (kept for backward compatibility)
     temp_x: Optional[float] = Field(default=None, description="Temperature X value (°F)")
     humidity: Optional[float] = Field(default=None, description="Target humidity (%)")
-    humidity_temp: Optional[float] = Field(default=None, description="Humidity temperature (°F)")
-    timer_sec: Optional[int] = Field(default=None, description="Timer duration (seconds)")
     
     farm: Optional[Farm] = Relationship(back_populates="devices")
     commands: List["Command"] = Relationship(back_populates="device")
