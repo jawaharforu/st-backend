@@ -5,6 +5,8 @@ services:
       - .:/app
     ports:
       - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - DATABASE_URL=postgresql+asyncpg://incubator_user:IncubatorPass@123@host.docker.internal:5432/incubator_db
       - MQTT_BROKER=mqtt
@@ -18,8 +20,6 @@ services:
       - mqtt
       - redis
       - minio
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     restart: unless-stopped
 
