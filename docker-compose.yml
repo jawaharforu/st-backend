@@ -6,41 +6,22 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:password@db:5432/incubator_db
+      - DATABASE_URL=postgresql+asyncpg://incubator_user:IncubatorPass@123@host.docker.internal:5432/incubator_db
       - MQTT_BROKER=mqtt
       - MQTT_PORT=1883
       - REDIS_URL=redis://redis:6379/0
-      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=firmware
     depends_on:
-      - db
       - mqtt
       - redis
       - minio
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     restart: unless-stopped
-
-  db:
-    image: timescale/timescaledb:latest-pg15
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=incubator_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
 
   mqtt:
     image: emqx/emqx:5.0.26
@@ -72,5 +53,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data:
   minio_data:
