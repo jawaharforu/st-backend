@@ -5,7 +5,7 @@ from sqlmodel import select
 import uuid
 
 from app.api import deps
-from app.models import Farm, User, Device
+from app.models import Farm, User, Device, UserRole
 from app.schemas.farm import FarmCreate, FarmResponse, FarmUpdate
 from app.schemas.device import DeviceResponse, DeviceCreate
 
@@ -50,7 +50,7 @@ async def create_farm(
         email=farm_in.email,
         hashed_password=get_password_hash(farm_in.password),
         full_name=farm_in.name, # Use farm name as user name essentially
-        role="OPERATOR"
+        role=UserRole.OPERATOR
     )
     db.add(new_user)
     await db.commit()
