@@ -50,8 +50,7 @@ async def create_farm(
         email=farm_in.email,
         hashed_password=get_password_hash(farm_in.password),
         full_name=farm_in.name, # Use farm name as user name essentially
-        role="farm",
-        is_active=True
+        role="OPERATOR"
     )
     db.add(new_user)
     await db.commit()
