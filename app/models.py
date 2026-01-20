@@ -4,7 +4,7 @@ from typing import Optional, List, Dict, Any
 from enum import Enum
 
 from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column, JSON, DateTime, func, String, Boolean, text
+from sqlalchemy import Column, JSON, DateTime, func, String, Boolean, text, Enum as SAEnum
 from pydantic import EmailStr
 
 # Enums
@@ -22,8 +22,7 @@ class CommandStatus(str, Enum):
 class UserBase(SQLModel):
     email: EmailStr = Field(unique=True, index=True)
     full_name: Optional[str] = None
-    # role: UserRole = Field(default=UserRole.OPERATOR)
-    role: str
+    role: UserRole = Field(sa_column=Column(SAEnum(UserRole, name="userrole", create_type=False)))
 
 class User(UserBase, table=True):
     id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)
