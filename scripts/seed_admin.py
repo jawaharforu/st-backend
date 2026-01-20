@@ -9,12 +9,13 @@ sys.path.insert(0, '.')
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from passlib.context import CryptContext
+import bcrypt
 
 from app.models import User
 from app.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 # Admin user details - CHANGE THESE!
 ADMIN_EMAIL = "admin@example.com"
@@ -39,7 +40,7 @@ async def create_admin():
         admin = User(
             email=ADMIN_EMAIL,
             full_name=ADMIN_FULL_NAME,
-            hashed_password=pwd_context.hash(ADMIN_PASSWORD),
+            hashed_password=hash_password(ADMIN_PASSWORD),
             role="admin"
         )
         
