@@ -18,6 +18,16 @@ services:
       timeout: 5s
       retries: 5
 
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    networks:
+      - incubator-network
+    depends_on:
+      - db
+
   mqtt:
     image: emqx/emqx:5.0.26
     ports:

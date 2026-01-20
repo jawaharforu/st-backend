@@ -1,0 +1,41 @@
+# 1. Upload code to server
+scp -r ./st-backend/* user@your-server:/opt/st-backend/
+# 2. Configure environment
+cp .env.example .env
+nano .env  # Update passwords and secrets
+# 3. Start all containers (PostgreSQL, MQTT, Redis, MinIO)
+docker compose -f docker-compose.prod.yml up -d
+# 4. Run migrations and start backend
+python3.11 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt gunicorn
+alembic upgrade head
+sudo systemctl enable --now st-backend
+
+# Install Python 3.11
+sudo apt update
+sudo apt install -y software-properties-common
+sudo add-apt-repository ppa:deadsnakes/ppa -y
+sudo apt install -y python3.11 python3.11-venv python3.11-dev
+# Then create the venv
+python3.11 -m venv venv
+source venv/bin/activate
+# Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+# Run migrations
+alembic upgrade head
+
+# Stop and remove the existing database container and volume
+docker compose -f docker-compose.prod.yml down
+docker volume rm st-backend_postgres_data
+# Make sure .env has matching passwords:
+# POSTGRES_PASSWORD=postgres1234
+# DATABASE_URL=postgresql+asyncpg://postgres:postgres1234@localhost:5432/incubator_db
+# Restart containers
+docker compose -f docker-compose.prod.yml up -d
+# Wait for DB to be ready
+sleep 10
+# Run migrations
+alembic upgrade head
+
+nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > app.log 2>&1 &
