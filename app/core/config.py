@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings
-from typing import Optional
+from pydantic import field_validator
+from typing import Optional, List, Union
+import json
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Smart Incubator Backend"
@@ -28,7 +30,17 @@ class Settings(BaseSettings):
     MINIO_SECURE: bool = False
     
     # CORS
-    BACKEND_CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:3001", "http://localhost:8000"]
+    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:3001", "http://localhost:8000"]
+    
+    @field_validator('BACKEND_CORS_ORIGINS', mode='before')
+    @classmethod
+    def parse_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return [origin.strip() for origin in v.split(',')]
+        return v
 
     class Config:
         env_file = ".env"

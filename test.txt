@@ -39,3 +39,10 @@ sleep 10
 alembic upgrade head
 
 nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > app.log 2>&1 &
+
+
+# If running with nohup, find and kill the process first
+pkill -f uvicorn
+nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > app.log 2>&1 &
+# If running in foreground, just Ctrl+C and restart
+uvicorn app.main:app --host 0.0.0.0 --port 8000
